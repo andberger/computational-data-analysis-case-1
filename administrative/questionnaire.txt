@@ -1,0 +1,14 @@
+Q: How many other groups do you think used the same or almost the same method as you:
+A: 
+
+Q: How many percent of the groups do you think had a better prediction than you?
+A: 
+
+Q: Approximately how many hours did you spend on this case (in total)?
+A: 
+
+Q: How difficult did you find the case (scale 0-10, with 10 being the highest difficulty)?
+A: 
+
+Q: Relative to the rest of the class, how do you generally consider your own competence (scale 0-10, with 10 being the highest)?
+A: 
