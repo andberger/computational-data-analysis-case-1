@@ -2,10 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# read data as csv
-df = pd.read_csv('dataCase1.csv')
-
-# data preparation
+''' Utils '''
 def get_most_common_value(column):
     return df[column].value_counts().head(1).index.values[0]
 
@@ -15,29 +12,30 @@ def replace_nan(x, replace_value):
     else:
         return x
 
+''' Read in data '''
+df = pd.read_csv('dataCase1.csv')
+
+''' Data preparation '''
+# feature columns holding numerical data
+columns_num = df.columns[1:96]
+
+# feature columns holding categorical data
+columns_cat = df.columns[96:]
+
 # Numerical nan's: replace missing values with the mean.
-columns = df.columns[1:]
-for i in range(len(columns) - 5):
-    mean = df[columns[i]].mean()
-    df[columns[i]] = df[columns[i]].map(lambda x: replace_nan(x, mean))
+for i in range(len(columns_num)):
+    mean = df[columns_num[i]].mean()
+    df[columns_num[i]] = df[columns_num[i]].map(lambda x: replace_nan(x, mean))
 
 # Categorical nan's: replace the missing entries with the most frequent one.
-#TODO: put in a loop
-x96_mcv = get_most_common_value('X96') #B
-x97_mcv = get_most_common_value('X97') #B
-x98_mcv = get_most_common_value('X98') #D
-x99_mcv = get_most_common_value('X99') #D
-x100_mcv = get_most_common_value('X100') #D
+for i in range(len(columns_cat)):
+    most_common_value = get_most_common_value(columns_cat[i])
+    df[columns_cat[i]] = df[columns_cat[i]].map(lambda x: replace_nan(x, most_common_value))
 
-df['X96'] = df['X96'].map(lambda x: replace_nan(x, x96_mcv))
-df['X97'] = df['X97'].map(lambda x: replace_nan(x, x97_mcv))
-df['X98'] = df['X98'].map(lambda x: replace_nan(x, x98_mcv))
-df['X99'] = df['X99'].map(lambda x: replace_nan(x, x98_mcv))
-df['X100'] = df['X100'].map(lambda x: replace_nan(x, x100_mcv))
+# Use one-hot encoding to transform categorical data
 
 
-
-# Exploratory data analysis
+''' Exploratory data analysis '''
 # use numpy array from now on
 data = df.values
 
