@@ -33,7 +33,17 @@ for i in range(len(columns_cat)):
     df[columns_cat[i]] = df[columns_cat[i]].map(lambda x: replace_nan(x, most_common_value))
 
 # Use one-hot encoding to transform categorical data
+one_hot_encodings = {}
+for i in range(len(columns_cat)):
+    df_dummies = pd.get_dummies(df[columns_cat[i]], prefix = columns_cat[i])
+    one_hot_encodings[columns_cat[i]] = df_dummies
 
+# drop original categorical columns
+df = df.drop(columns=list(columns_cat))
+
+# append the one-hot encodings of the categorical columns
+for _, value in one_hot_encodings.items():
+    df = pd.concat([df, value], axis=1)
 
 ''' Exploratory data analysis '''
 # use numpy array from now on
