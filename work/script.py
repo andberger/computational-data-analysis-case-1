@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import Ridge
+from sklearn.metrics import r2_score
+from sklearn.preprocessing import StandardScaler
 
 ''' Utils '''
 def get_most_common_value(column):
@@ -11,6 +14,16 @@ def replace_nan(x, replace_value):
         return replace_value
     else:
         return x
+
+#A helper method for pretty-printing linear models
+def pretty_print_linear(coefs, names = None, sort = False):
+    if names == None:
+        names = ["X%s" % x for x in range(len(coefs))]
+    lst = zip(coefs, names)
+    if sort:
+        lst = sorted(lst,  key = lambda x:-np.abs(x[0]))
+    return " + ".join("%s * %s" % (round(coef, 3), name)
+                                   for coef, name in lst)
 
 ''' Read in data '''
 df = pd.read_csv('dataCase1.csv')
@@ -45,17 +58,25 @@ df = df.drop(columns=list(columns_cat))
 for _, value in one_hot_encodings.items():
     df = pd.concat([df, value], axis=1)
 
-''' Exploratory data analysis '''
+''' Regression '''
 # use numpy array from now on
-data = df.values
+data = df.values[:100]
+X = data[:, 1:]
+y = data[:, 0]
 
-y = data[:100, 0]
-X = data[:100, 1:]
+# Ridge regression with cross validation
+from sklearn.linear_model import RidgeCV
+ridge = RidgeCV(alphas=[1e-3, 1e-2, 1e-1, 1], normalize=True, store_cv_values=True).fit(X, y)
+score = ridge.score(X, y)
+print(ridge.get_params())
+print(score)
+print(ridge.predict(df.values[100:105, 1:]))
+print(ridge.alpha_)
 
-# descriptive stats
-
-
-# modelling
-
-
-# estimating the root mean squared error
+# Lasso regression with cross validation
+from sklearn.linear_model import LassoCV
+lasso = LassoCV(cv=5, normalize=True).fit(X, y)
+score_lasso = lasso.score(X, y)
+print(score_lasso)
+print(lasso.predict(df.values[100:105, 1:]))
+print(lasso.alpha_)
