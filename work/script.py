@@ -1,9 +1,9 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.linear_model import Ridge
-from sklearn.metrics import r2_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score, GridSearchCV
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 
 ''' Utils '''
 def get_most_common_value(column):
@@ -15,24 +15,14 @@ def replace_nan(x, replace_value):
     else:
         return x
 
-#A helper method for pretty-printing linear models
-def pretty_print_linear(coefs, names = None, sort = False):
-    if names == None:
-        names = ["X%s" % x for x in range(len(coefs))]
-    lst = zip(coefs, names)
-    if sort:
-        lst = sorted(lst,  key = lambda x:-np.abs(x[0]))
-    return " + ".join("%s * %s" % (round(coef, 3), name)
-                                   for coef, name in lst)
-
 ''' Read in data '''
 df = pd.read_csv('dataCase1.csv')
 
 ''' Data preparation '''
-# feature columns holding numerical data
+# Feature columns holding numerical data
 columns_num = df.columns[1:96]
 
-# feature columns holding categorical data
+# Feature columns holding categorical data
 columns_cat = df.columns[96:]
 
 # Numerical nan's: replace missing values with the mean.
@@ -51,38 +41,53 @@ for i in range(len(columns_cat)):
     df_dummies = pd.get_dummies(df[columns_cat[i]], prefix = columns_cat[i])
     one_hot_encodings[columns_cat[i]] = df_dummies
 
-# drop original categorical columns
+# Drop original categorical columns
 df = df.drop(columns=list(columns_cat))
 
-# append the one-hot encodings of the categorical columns
+# Append the one-hot encodings of the categorical columns
 for _, value in one_hot_encodings.items():
     df = pd.concat([df, value], axis=1)
 
+''' Standardize '''
+scaler = StandardScaler()
+df = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
+
 ''' Regression '''
-# use numpy array from now on
+# Use numpy array from now on
 data = df.values[:100]
 X = data[:, 1:]
 y = data[:, 0]
 
+# Linear regression with cross validation
+lin_reg = LinearRegression()
+MSEs = cross_val_score(lin_reg, X, y, scoring='neg_mean_squared_error', cv=5)
+mean_MSE = np.mean(MSEs)
+print(mean_MSE)
+
+# Number of folds for cross validation
+K = 5
+
+# Hyperparameter values to try
+#params = {'alpha': [1e-15, 1e-10, 1e-8, 1e-4, 1e-3, 1e-2, 1e-1, 1, 5, 10]}
+params = {'alpha': list(np.logspace(-4, 3, 100))}
+
 # Ridge regression with cross validation
-from sklearn.linear_model import RidgeCV
-ridge = RidgeCV(cv=5, alphas=[1e-3, 1e-2, 1e-1, 1], normalize=True).fit(X, y)
-score_ridge = ridge.score(X, y)
-print(score_ridge)
-print(ridge.predict(df.values[100:105, 1:]))
+ridge = Ridge()
+ridge_regressor = GridSearchCV(ridge, params, scoring='neg_mean_squared_error', cv=K)
+ridge_regressor.fit(X, y)
+print(ridge_regressor.best_params_)
+print(ridge_regressor.best_score_)
 
 # Lasso regression with cross validation
-from sklearn.linear_model import LassoCV
-lasso = LassoCV(cv=5, normalize=True).fit(X, y)
-score_lasso = lasso.score(X, y)
-print(score_lasso)
-print(lasso.predict(df.values[100:105, 1:]))
+lasso = Lasso()
+lasso_regressor = GridSearchCV(lasso, params, scoring='neg_mean_squared_error', cv=K)
+lasso_regressor.fit(X, y)
+print(lasso_regressor.best_params_)
+print(lasso_regressor.best_score_)
 
 # ElasticNet regression with cross validation
-from sklearn.linear_model import ElasticNetCV
-elastic = ElasticNetCV(cv=5, normalize=True).fit(X, y)
-score_elastic = elastic.score(X,y)
-print(score_elastic)
-print(elastic.predict(df.values[100:105, 1:]))
-
-import pdb; pdb.set_trace()
+elastic = ElasticNet()
+elastic_regressor = GridSearchCV(elastic, params, scoring='neg_mean_squared_error', cv=K)
+elastic_regressor.fit(X, y)
+print(elastic_regressor.best_params_)
+print(elastic_regressor.best_score_)
