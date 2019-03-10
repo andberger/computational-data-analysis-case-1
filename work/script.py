@@ -66,12 +66,10 @@ y = data[:, 0]
 
 # Ridge regression with cross validation
 from sklearn.linear_model import RidgeCV
-ridge = RidgeCV(alphas=[1e-3, 1e-2, 1e-1, 1], normalize=True, store_cv_values=True).fit(X, y)
-score = ridge.score(X, y)
-print(ridge.get_params())
-print(score)
+ridge = RidgeCV(cv=5, alphas=[1e-3, 1e-2, 1e-1, 1], normalize=True).fit(X, y)
+score_ridge = ridge.score(X, y)
+print(score_ridge)
 print(ridge.predict(df.values[100:105, 1:]))
-print(ridge.alpha_)
 
 # Lasso regression with cross validation
 from sklearn.linear_model import LassoCV
@@ -79,4 +77,12 @@ lasso = LassoCV(cv=5, normalize=True).fit(X, y)
 score_lasso = lasso.score(X, y)
 print(score_lasso)
 print(lasso.predict(df.values[100:105, 1:]))
-print(lasso.alpha_)
+
+# ElasticNet regression with cross validation
+from sklearn.linear_model import ElasticNetCV
+elastic = ElasticNetCV(cv=5, normalize=True).fit(X, y)
+score_elastic = elastic.score(X,y)
+print(score_elastic)
+print(elastic.predict(df.values[100:105, 1:]))
+
+import pdb; pdb.set_trace()
