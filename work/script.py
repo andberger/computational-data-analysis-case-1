@@ -61,6 +61,11 @@ y = data[:, 0]
 results = {}
 
 # Linear regression with cross validation
+'''
+    Note: In sklearn, all scorer objects follow the convention that
+    higher return values are better than lower return values,
+    that's why the mean squared error is given as a negative.
+'''
 lin_reg = LinearRegression()
 MSEs = cross_val_score(lin_reg, X, y, scoring='neg_mean_squared_error', cv=5)
 mean_MSE = np.mean(MSEs)
