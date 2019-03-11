@@ -58,36 +58,49 @@ data = df.values[:100]
 X = data[:, 1:]
 y = data[:, 0]
 
+results = {}
+
 # Linear regression with cross validation
 lin_reg = LinearRegression()
 MSEs = cross_val_score(lin_reg, X, y, scoring='neg_mean_squared_error', cv=5)
 mean_MSE = np.mean(MSEs)
-print(mean_MSE)
+results['Linear'] = (mean_MSE, None)
 
 # Number of folds for cross validation
 K = 5
 
 # Hyperparameter values to try
-#params = {'alpha': [1e-15, 1e-10, 1e-8, 1e-4, 1e-3, 1e-2, 1e-1, 1, 5, 10]}
 params = {'alpha': list(np.logspace(-4, 3, 100))}
 
 # Ridge regression with cross validation
 ridge = Ridge()
 ridge_regressor = GridSearchCV(ridge, params, scoring='neg_mean_squared_error', cv=K)
 ridge_regressor.fit(X, y)
-print(ridge_regressor.best_params_)
-print(ridge_regressor.best_score_)
+results['Ridge'] = (ridge_regressor.best_score_, ridge_regressor.best_params_['alpha'])
 
 # Lasso regression with cross validation
 lasso = Lasso()
 lasso_regressor = GridSearchCV(lasso, params, scoring='neg_mean_squared_error', cv=K)
 lasso_regressor.fit(X, y)
-print(lasso_regressor.best_params_)
-print(lasso_regressor.best_score_)
+results['Lasso'] = (lasso_regressor.best_score_, lasso_regressor.best_params_['alpha'])
 
 # ElasticNet regression with cross validation
 elastic = ElasticNet()
 elastic_regressor = GridSearchCV(elastic, params, scoring='neg_mean_squared_error', cv=K)
 elastic_regressor.fit(X, y)
-print(elastic_regressor.best_params_)
-print(elastic_regressor.best_score_)
+results['ElasticNet'] = (elastic_regressor.best_score_, elastic_regressor.best_params_['alpha'])
+
+# Plot the results
+pos = [1,2,3,4]
+values = [(t[0] * -1) for t in results.values()]
+labels = ['alpha = {0}'.format(round(t[1], 4)) for t in results.values() if t[1] is not None]
+
+plt.bar(pos, values, align='center', alpha=0.5)
+plt.xticks([r + 1 for r in range(len(results.keys()))], list(results.keys()), rotation=90)
+plt.ylabel('MSE')
+plt.title('Regression methods MSE')
+for i in range(len(results.keys()) - 1):
+    if labels[i] is not None:
+        plt.text(x = (pos[i+1])-0.25 , y = values[i+1]+0.01, s = labels[i], size = 6)
+plt.subplots_adjust(bottom= 0.20, top = 0.90)
+plt.show()
