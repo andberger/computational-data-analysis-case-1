@@ -61,49 +61,48 @@ y = data[:, 0]
 results = {}
 
 # Linear regression with cross validation
-'''
-    Note: In sklearn, all scorer objects follow the convention that
-    higher return values are better than lower return values,
-    that's why the mean squared error is given as a negative.
-'''
 lin_reg = LinearRegression()
-MSEs = cross_val_score(lin_reg, X, y, scoring='neg_mean_squared_error', cv=5)
-mean_MSE = np.mean(MSEs)
-results['Linear'] = (mean_MSE, None)
+R2s = cross_val_score(lin_reg, X, y, scoring='r2', cv=5)
+R2 = np.mean(R2s)
+results['Linear'] = (R2, None)
+print(R2)
 
 # Number of folds for cross validation
-K = 5
+K = 10
 
 # Hyperparameter values to try
 params = {'alpha': list(np.logspace(-4, 3, 100))}
 
 # Ridge regression with cross validation
 ridge = Ridge()
-ridge_regressor = GridSearchCV(ridge, params, scoring='neg_mean_squared_error', cv=K)
+ridge_regressor = GridSearchCV(ridge, params, scoring='r2', cv=K)
 ridge_regressor.fit(X, y)
 results['Ridge'] = (ridge_regressor.best_score_, ridge_regressor.best_params_['alpha'])
+print(ridge_regressor.best_score_)
 
 # Lasso regression with cross validation
 lasso = Lasso()
-lasso_regressor = GridSearchCV(lasso, params, scoring='neg_mean_squared_error', cv=K)
+lasso_regressor = GridSearchCV(lasso, params, scoring='r2', cv=K)
 lasso_regressor.fit(X, y)
 results['Lasso'] = (lasso_regressor.best_score_, lasso_regressor.best_params_['alpha'])
+print(lasso_regressor.best_score_)
 
 # ElasticNet regression with cross validation
 elastic = ElasticNet()
-elastic_regressor = GridSearchCV(elastic, params, scoring='neg_mean_squared_error', cv=K)
+elastic_regressor = GridSearchCV(elastic, params, scoring='r2', cv=K)
 elastic_regressor.fit(X, y)
 results['ElasticNet'] = (elastic_regressor.best_score_, elastic_regressor.best_params_['alpha'])
+print(elastic_regressor.best_score_)
 
 # Plot the results
 pos = [1,2,3,4]
-values = [(t[0] * -1) for t in results.values()]
+values = [t[0] for t in results.values()]
 labels = ['alpha = {0}'.format(round(t[1], 4)) for t in results.values() if t[1] is not None]
 
 plt.bar(pos, values, align='center', alpha=0.5)
 plt.xticks([r + 1 for r in range(len(results.keys()))], list(results.keys()), rotation=90)
-plt.ylabel('MSE')
-plt.title('Regression methods MSE')
+plt.ylabel('R2')
+plt.title('Regression methods R2')
 for i in range(len(results.keys()) - 1):
     if labels[i] is not None:
         plt.text(x = (pos[i+1])-0.25 , y = values[i+1]+0.01, s = labels[i], size = 6)
