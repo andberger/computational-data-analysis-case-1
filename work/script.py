@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -112,14 +113,24 @@ results['ElasticNet'] = (elastic_regressor.best_score_, elastic_regressor.best_p
 print(elastic_regressor.best_score_)
 
 # Plot the results
-plot = False
+plot = True
 if plot:
     plot_results(results)
 
 ''' Lasso regression gives the best predictive performance.
-    Let's finalize a Lasso regression model to make predictions on new data.
+    Let's use the best Lasso regression model found to make predictions on new data.
 '''
 lasso_final = lasso_regressor.best_estimator_
 lasso_final.fit(X, y)
 y_predict = lasso_final.predict(X_new)
-import pdb; pdb.set_trace()
+
+# Estimate the predictive performance of the model
+'''
+    Note: In sklearn, all scorer objects follow the convention that
+    higher return values are better than lower return values,
+    that's why the mean squared error is given as a negative, and hence the mult with -1.
+'''
+scores = cross_val_score(lasso_final, X_new, y_predict, cv=K, scoring='neg_mean_squared_error')
+MSE = np.mean(scores) * -1
+RMSE = math.sqrt(MSE)
+print('The estimated root mean squared error is: {0}'.format(RMSE))
