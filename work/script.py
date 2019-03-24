@@ -78,15 +78,15 @@ X_new = new_data[:, 1:]
 
 results = {}
 
+# Number of folds for cross validation
+K = 10
+
 # Linear regression with cross validation
 lin_reg = LinearRegression(normalize=True)
-R2s = cross_val_score(lin_reg, X, y, scoring='r2', cv=5)
+R2s = cross_val_score(lin_reg, X, y, scoring='r2', cv=K)
 R2 = np.mean(R2s)
 results['Linear'] = (R2, None)
 print(R2)
-
-# Number of folds for cross validation
-K = 10
 
 # Hyperparameter values to try
 params = {'alpha': list(np.logspace(-4, 3, 100))}
