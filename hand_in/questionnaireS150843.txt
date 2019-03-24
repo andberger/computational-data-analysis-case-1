@@ -1,0 +1,14 @@
+Q: How many other groups do you think used the same or almost the same method as you:
+A: Probably many of the other groups used similar methods, since it is pretty evident that this is some sort of a regression problem and cross-validation is a simple technique to use as well.
+
+Q: How many percent of the groups do you think had a better prediction than you?
+A: I'd say maybe 20-30% of the groups could have better predictions.
+
+Q: Approximately how many hours did you spend on this case (in total)?
+A: At least around 30-40 hours I believe.
+
+Q: How difficult did you find the case (scale 0-10, with 10 being the highest difficulty)?
+A: Maybe around 7 or 8, due to the open nature of the case.
+
+Q: Relative to the rest of the class, how do you generally consider your own competence (scale 0-10, with 10 being the highest)?
+A: I'd probably put me around 7 or 8 on that scale.
