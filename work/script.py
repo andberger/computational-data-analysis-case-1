@@ -130,7 +130,7 @@ y_predict = lasso_final.predict(X_new)
     higher return values are better than lower return values,
     that's why the mean squared error is given as a negative, and hence the mult with -1.
 '''
-scores = cross_val_score(lasso_final, X_new, y_predict, cv=K, scoring='neg_mean_squared_error')
+scores = cross_val_score(lasso_final, X, y, cv=K, scoring='neg_mean_squared_error')
 MSE = np.mean(scores) * -1
 RMSE = math.sqrt(MSE)
 print('The estimated root mean squared error is: {0}'.format(RMSE))
