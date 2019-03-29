@@ -65,8 +65,8 @@ for _, value in one_hot_encodings.items():
     df = pd.concat([df, value], axis=1)
 
 ''' Standardize '''
-scaler = StandardScaler()
-df = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
+#scaler = StandardScaler()
+#df = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
 
 ''' Regression '''
 # Use numpy array from now on
@@ -113,7 +113,7 @@ results['ElasticNet'] = (elastic_regressor.best_score_, elastic_regressor.best_p
 print(elastic_regressor.best_score_)
 
 # Plot the results
-plot = True
+plot = False
 if plot:
     plot_results(results)
 
